@@ -1,0 +1,25 @@
+node_modules/
+.next/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.local
+backend/data/*.db
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+backend/venv/
+backend/__pycache__/
+backend/data/route53.db
+backend/.env
+
+
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+# Reference info (not for repo)
+info.txt
