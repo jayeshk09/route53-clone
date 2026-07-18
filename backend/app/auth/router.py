@@ -43,9 +43,10 @@ def login(body: LoginRequest, response: Response, db: Session = Depends(get_db))
         key="session_token",
         value=session.token,
         httponly=True,
-        samesite="strict",
+        secure=True,
+        samesite="none",
         max_age=86400,
-        secure=False,
+        path="/",
     )
 
     return {
