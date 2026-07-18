@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Button from "@/components/common/Button";
 import Input from "@/components/common/Input";
+import { waitForBackend } from "@/lib/waitForBackend";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -14,6 +15,22 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [backendReady, setBackendReady] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function wake() {
+      await waitForBackend();
+      if (mounted) setBackendReady(true);
+    }
+
+    wake();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   function validate(): boolean {
     const errs: Record<string, string> = {};
@@ -40,6 +57,36 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (!backendReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f5]">
+        <div className="text-center max-w-sm px-4">
+          <svg width="60" height="36" viewBox="0 0 60 36" className="mx-auto mb-4">
+            <rect width="60" height="36" rx="6" fill="#ff9900" />
+            <text x="30" y="24" textAnchor="middle" fill="#232f3e" fontSize="16" fontWeight="bold" fontFamily="Arial">
+              AWS
+            </text>
+          </svg>
+
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Starting backend...
+          </h2>
+
+          <p className="text-sm text-gray-500 leading-relaxed">
+            The backend is hosted on a free tier and may take up to
+            a minute to wake after inactivity.
+          </p>
+
+          <div className="mt-6 flex justify-center">
+            <div className="h-2 w-2 bg-[#ff9900] rounded-full animate-bounce [animation-delay:0ms]" />
+            <div className="h-2 w-2 bg-[#ff9900] rounded-full animate-bounce ml-1 [animation-delay:150ms]" />
+            <div className="h-2 w-2 bg-[#ff9900] rounded-full animate-bounce ml-1 [animation-delay:300ms]" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
